@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New Booking - JCB Management System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/customer/dashboard">JCB Management System</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/customer/dashboard">Dashboard</a>
+                <a class="nav-link" href="/customer/bookings">My Bookings</a>
+                <a class="nav-link" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="bi bi-plus-circle"></i> Create New Booking</h3>
+                        <p class="mb-0 text-muted">Select a machine and provide booking details</p>
+                    </div>
+                    <div class="card-body">
+                        <!-- Error Messages -->
+                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                            <span th:text="${errorMessage}"></span>
+                        </div>
+
+                        <form th:action="@{/customer/bookings/create}" method="post" enctype="multipart/form-data">
+                            <!-- Machine Selection -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <h5 class="mb-3">Available Machines</h5>
+                                    <div class="row" th:if="${!#lists.isEmpty(machines)}">
+                                        <div class="col-md-6 col-lg-4 mb-3" th:each="machine : ${machines}">
+                                            <div class="card h-100">
+                                                <div class="card-body">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" 
+                                                               name="machineId" th:value="${machine.machineID}" 
+                                                               th:id="'machine' + ${machine.machineID}" required>
+                                                        <label class="form-check-label" th:for="'machine' + ${machine.machineID}">
+                                                            <h6 class="card-title" th:text="${machine.model}"></h6>
+                                                        </label>
+                                                    </div>
+                                                    <p class="card-text small text-muted" th:text="${machine.description}"></p>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="badge bg-success">Available</span>
+                                                        <span class="fw-bold text-primary" 
+                                                              th:text="${machine.hourlyRate != null ? '$' + machine.hourlyRate + '/hr' : 'Contact for pricing'}"></span>
+                                                    </div>
+                                                    <small class="text-muted" th:if="${machine.location}" th:text="'Location: ' + ${machine.location}"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${#lists.isEmpty(machines)}" class="alert alert-warning">
+                                        <i class="bi bi-exclamation-triangle"></i> No machines are currently available for booking.
+                                        <a href="/customer/dashboard" class="btn btn-sm btn-outline-primary ms-2">Back to Dashboard</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Booking Details -->
+                            <div class="row mb-4" th:if="${!#lists.isEmpty(machines)}">
+                                <div class="col-md-6">
+                                    <label for="startDate" class="form-label">Start Date & Time</label>
+                                    <input type="datetime-local" class="form-control" id="startDate" name="startDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="endDate" class="form-label">End Date & Time</label>
+                                    <input type="datetime-local" class="form-control" id="endDate" name="endDate" required>
+                                </div>
+                            </div>
+
+                            <!-- Additional Information -->
+                            <div class="row mb-4" th:if="${!#lists.isEmpty(machines)}">
+                                <div class="col-md-12">
+                                    <label for="notes" class="form-label">Additional Notes (Optional)</label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                              placeholder="Any special requirements or additional information..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Payment Section -->
+                            <div class="row mb-4" th:if="${!#lists.isEmpty(machines)}">
+                                <div class="col-md-12">
+                                    <h5 class="mb-3">Payment Information</h5>
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle"></i>
+                                        <strong>Payment Instructions:</strong>
+                                        <p class="mb-2">Please make your payment to the following account and upload the bank slip:</p>
+                                        <ul class="mb-0">
+                                            <li><strong>Bank:</strong> ABC Bank</li>
+                                            <li><strong>Account Name:</strong> JCB Management Ltd</li>
+                                            <li><strong>Account Number:</strong> 1234567890</li>
+                                            <li><strong>Reference:</strong> Use your booking reference (will be provided after submission)</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="paymentSlip" class="form-label">Upload Bank Slip</label>
+                                        <input type="file" class="form-control" id="paymentSlip" name="paymentSlip" 
+                                               accept=".pdf,.jpg,.jpeg,.png" required>
+                                        <div class="form-text">Accepted formats: PDF, JPG, PNG (Max size: 10MB)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="row" th:if="${!#lists.isEmpty(machines)}">
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="/customer/bookings" class="btn btn-secondary">
+                                            <i class="bi bi-arrow-left"></i> Back to My Bookings
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-circle"></i> Create Booking
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set minimum date to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+            
+            document.getElementById('startDate').min = minDateTime;
+            document.getElementById('endDate').min = minDateTime;
+            
+            // Update end date minimum when start date changes
+            document.getElementById('startDate').addEventListener('change', function() {
+                document.getElementById('endDate').min = this.value;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Finance Dashboard - JCB Management System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-warning">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">JCB Management System</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">Welcome, <span th:text="${user.username}"></span> (Finance Officer)</span>
+                <a class="nav-link" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Finance Dashboard</h2>
+                <p class="text-muted">Manage invoices, payments, and financial reports</p>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Invoices</h5>
+                                <p>Generate & manage</p>
+                            </div>
+                            <i class="bi bi-receipt fs-1"></i>
+                        </div>
+                        <a href="/finance/invoices" class="btn btn-light btn-sm mt-2">Invoices</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Payments</h5>
+                                <p>Track payments</p>
+                            </div>
+                            <i class="bi bi-credit-card fs-1"></i>
+                        </div>
+                        <a href="/finance/payments" class="btn btn-light btn-sm mt-2">Payments</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Financial Reports</h5>
+                                <p>View analytics</p>
+                            </div>
+                            <i class="bi bi-graph-up fs-1"></i>
+                        </div>
+                        <a href="/finance/reports" class="btn btn-light btn-sm mt-2">Reports</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Outstanding</h5>
+                                <p>Pending payments</p>
+                            </div>
+                            <i class="bi bi-exclamation-triangle fs-1"></i>
+                        </div>
+                        <a href="/finance/outstanding" class="btn btn-light btn-sm mt-2">Outstanding</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

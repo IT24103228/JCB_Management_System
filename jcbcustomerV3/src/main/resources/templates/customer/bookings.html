@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Bookings - JCB Management System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/customer/dashboard">JCB Management System</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/customer/dashboard">Dashboard</a>
+                <a class="nav-link" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2>My Bookings</h2>
+                        <p class="text-muted">View and manage your machine bookings</p>
+                    </div>
+                    <a href="/customer/bookings/new" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> New Booking
+                    </a>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Bookings Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(bookings)}" class="text-center py-5">
+                            <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                            <h4 class="mt-3 text-muted">No bookings found</h4>
+                            <p class="text-muted">You haven't made any bookings yet.</p>
+                            <a href="/customer/bookings/new" class="btn btn-primary">Make Your First Booking</a>
+                        </div>
+
+                        <div th:if="${!#lists.isEmpty(bookings)}" class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Booking ID</th>
+                                        <th>Machine</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Status</th>
+                                        <th>Total Cost</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="booking : ${bookings}">
+                                        <td th:text="${booking.bookingID}"></td>
+                                        <td th:text="${booking.machine.model}"></td>
+                                        <td th:text="${#temporals.format(booking.startDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                        <td th:text="${#temporals.format(booking.endDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                        <td>
+                                            <span th:class="'badge ' + 
+                                                (${booking.status.name()} == 'PENDING' ? 'bg-warning' : 
+                                                 ${booking.status.name()} == 'CONFIRMED' ? 'bg-success' : 
+                                                 ${booking.status.name()} == 'CANCELLED' ? 'bg-danger' : 'bg-info')"
+                                                  th:text="${booking.status.name()}"></span>
+                                        </td>
+                                        <td th:text="${booking.totalCost != null ? '$' + booking.totalCost : 'TBD'}"></td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                                        data-bs-toggle="modal" 
+                                                        th:data-bs-target="'#viewModal' + ${booking.bookingID}">
+                                                    <i class="bi bi-eye"></i> View
+                                                </button>
+                                                <button th:if="${booking.status.name() == 'PENDING' or booking.status.name() == 'CONFIRMED'}"
+                                                        type="button" class="btn btn-sm btn-outline-warning"
+                                                        data-bs-toggle="modal" 
+                                                        th:data-bs-target="'#cancelModal' + ${booking.bookingID}">
+                                                    <i class="bi bi-x-circle"></i> Cancel
+                                                </button>
+                                                <button th:if="${booking.status.name() == 'CANCELLED'}"
+                                                        type="button" class="btn btn-sm btn-outline-danger"
+                                                        data-bs-toggle="modal" 
+                                                        th:data-bs-target="'#deleteModal' + ${booking.bookingID}">
+                                                    <i class="bi bi-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Booking Modals -->
+    <div th:each="booking : ${bookings}" th:id="'viewModal' + ${booking.bookingID}" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Booking Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Booking ID:</strong> <span th:text="${booking.bookingID}"></span></p>
+                    <p><strong>Machine:</strong> <span th:text="${booking.machine.model}"></span></p>
+                    <p><strong>Start Date:</strong> <span th:text="${#temporals.format(booking.startDate, 'dd/MM/yyyy HH:mm')}"></span></p>
+                    <p><strong>End Date:</strong> <span th:text="${#temporals.format(booking.endDate, 'dd/MM/yyyy HH:mm')}"></span></p>
+                    <p><strong>Status:</strong> <span th:text="${booking.status.name()}"></span></p>
+                    <p><strong>Total Cost:</strong> <span th:text="${booking.totalCost != null ? '$' + booking.totalCost : 'To be determined'}"></span></p>
+                    <p th:if="${booking.notes}"><strong>Notes:</strong> <span th:text="${booking.notes}"></span></p>
+                    <p><strong>Created:</strong> <span th:text="${#temporals.format(booking.createdAt, 'dd/MM/yyyy HH:mm')}"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Booking Modals -->
+    <div th:each="booking : ${bookings}" th:if="${booking.status.name() == 'PENDING' or booking.status.name() == 'CONFIRMED'}" 
+         th:id="'cancelModal' + ${booking.bookingID}" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancel Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this booking?</p>
+                    <p><strong>Machine:</strong> <span th:text="${booking.machine.model}"></span></p>
+                    <p><strong>Date:</strong> <span th:text="${#temporals.format(booking.startDate, 'dd/MM/yyyy')}"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Booking</button>
+                    <form th:action="@{'/customer/bookings/' + ${booking.bookingID} + '/cancel'}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-warning">Yes, Cancel Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Booking Modals -->
+    <div th:each="booking : ${bookings}" th:if="${booking.status.name() == 'CANCELLED'}" 
+         th:id="'deleteModal' + ${booking.bookingID}" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to permanently delete this booking?</p>
+                    <p><strong>Machine:</strong> <span th:text="${booking.machine.model}"></span></p>
+                    <p><strong>Date:</strong> <span th:text="${#temporals.format(booking.startDate, 'dd/MM/yyyy')}"></span></p>
+                    <p class="text-danger"><small>This action cannot be undone.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form th:action="@{'/customer/bookings/' + ${booking.bookingID} + '/delete'}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Yes, Delete Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
