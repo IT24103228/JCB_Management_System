@@ -30,7 +30,7 @@ public class Ticket {
     private TicketCategory category = TicketCategory.BOOKING;
 
     @Enumerated(EnumType.STRING)
-    private TicketStatus status = TicketStatus.OPEN;
+    private TicketStatus status = TicketStatus.IN_PROGRESS;
 
     private boolean flagged = false;
 

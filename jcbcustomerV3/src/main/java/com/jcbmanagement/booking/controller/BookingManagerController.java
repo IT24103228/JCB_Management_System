@@ -20,58 +20,76 @@ import java.util.List;
 @Controller
 @RequestMapping("/booking")
 public class BookingManagerController {
-    
+
     @Autowired
     private BookingService bookingService;
-    
+
     @Autowired
     private TicketService ticketService;
-    
+
     @Autowired
     private MachineService machineService;
-    
+
     @Autowired
     private UserService userService;
-    
+
     @GetMapping("/tickets")
     public String manageTickets(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        User bookingManager = userService.findByUsername(username).orElse(null);
-        
-        if (bookingManager != null) {
-            List<Ticket> assignedTickets = ticketService.getTicketsForUser(bookingManager);
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = auth.getName();
+            User bookingManager = userService.findByUsername(username).orElse(null);
+
+            if (bookingManager == null) {
+                model.addAttribute("errorMessage", "User not found");
+                model.addAttribute("tickets", List.of());
+                return "booking/tickets";
+            }
+
+            List<Ticket> assignedTickets;
+            if ("BOOKING_MANAGER".equals(bookingManager.getRole())) {
+                assignedTickets = ticketService.getTicketsForUser(bookingManager);
+            } else {
+                // If user is not a booking manager, show all tickets for admin
+                assignedTickets = ticketService.getAllTickets();
+            }
+
             model.addAttribute("tickets", assignedTickets);
+            model.addAttribute("user", bookingManager);
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Error loading tickets: " + e.getMessage());
+            model.addAttribute("tickets", List.of());
         }
-        
+
         return "booking/tickets";
     }
-    
+
     @GetMapping("/tickets/{id}")
     public String viewTicket(@PathVariable Long id, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         User bookingManager = userService.findByUsername(username).orElse(null);
-        
+
         if (bookingManager != null) {
             ticketService.getTicketById(id, bookingManager).ifPresent(ticket -> {
                 model.addAttribute("ticket", ticket);
                 model.addAttribute("responses", ticket.getResponses());
             });
         }
-        
+
         return "booking/ticket-details";
     }
-    
+
     @PostMapping("/tickets/{id}/status")
-    public String updateTicketStatus(@PathVariable Long id, 
-                                   @RequestParam TicketStatus status,
-                                   RedirectAttributes redirectAttributes) {
+    public String updateTicketStatus(@PathVariable Long id,
+                                     @RequestParam TicketStatus status,
+                                     RedirectAttributes redirectAttributes) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
             User bookingManager = userService.findByUsername(username).orElse(null);
-            
+
             if (bookingManager != null) {
                 ticketService.updateStatus(id, status, bookingManager);
                 redirectAttributes.addFlashAttribute("successMessage", "Ticket status updated successfully!");
@@ -79,17 +97,17 @@ public class BookingManagerController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        
+
         return "redirect:/booking/tickets/" + id;
     }
-    
+
     @PostMapping("/tickets/{id}/flag")
     public String flagTicketForAdmin(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
             User bookingManager = userService.findByUsername(username).orElse(null);
-            
+
             if (bookingManager != null) {
                 ticketService.flagTicketForAdmin(id, bookingManager);
                 redirectAttributes.addFlashAttribute("successMessage", "Ticket flagged for admin review!");
@@ -97,19 +115,19 @@ public class BookingManagerController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        
+
         return "redirect:/booking/tickets/" + id;
     }
-    
+
     @PostMapping("/tickets/{id}/respond")
-    public String addTicketResponse(@PathVariable Long id, 
-                                  @RequestParam String message,
-                                  RedirectAttributes redirectAttributes) {
+    public String addTicketResponse(@PathVariable Long id,
+                                    @RequestParam String message,
+                                    RedirectAttributes redirectAttributes) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
             User bookingManager = userService.findByUsername(username).orElse(null);
-            
+
             if (bookingManager != null) {
                 ticketService.addResponse(id, message, bookingManager);
                 redirectAttributes.addFlashAttribute("successMessage", "Response added successfully!");
@@ -117,7 +135,25 @@ public class BookingManagerController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        
+
         return "redirect:/booking/tickets/" + id;
+    }
+
+    @PostMapping("/tickets/{id}/solve")
+    public String solveTicket(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = auth.getName();
+            User bookingManager = userService.findByUsername(username).orElse(null);
+
+            if (bookingManager != null) {
+                ticketService.updateStatus(id, TicketStatus.SOLVED, bookingManager);
+                redirectAttributes.addFlashAttribute("successMessage", "Ticket marked as solved!");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/booking/tickets";
     }
 }

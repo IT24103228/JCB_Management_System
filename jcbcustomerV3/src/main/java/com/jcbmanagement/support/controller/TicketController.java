@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class TicketController {
     @Autowired
     private TicketService ticketService;
-    
+
     @Autowired
     private UserService userService;
 
@@ -50,7 +50,7 @@ public class TicketController {
                 redirectAttributes.addFlashAttribute("error", "Please log in to create a ticket");
                 return "redirect:/login";
             }
-            
+
             ticketService.createTicket(ticket, user);
             redirectAttributes.addFlashAttribute("success", "Ticket created successfully!");
             return "redirect:/support/my-tickets";
@@ -68,7 +68,7 @@ public class TicketController {
                 redirectAttributes.addFlashAttribute("error", "Please log in to view tickets");
                 return "redirect:/login";
             }
-            
+
             ticketService.getTicketById(id, user).ifPresentOrElse(ticket -> {
                 model.addAttribute("ticket", ticket);
                 model.addAttribute("responses", ticket.getResponses());
@@ -92,7 +92,7 @@ public class TicketController {
                 redirectAttributes.addFlashAttribute("error", "Please log in to respond to tickets");
                 return "redirect:/login";
             }
-            
+
             ticketService.addResponse(id, message, user);
             redirectAttributes.addFlashAttribute("success", "Response added successfully!");
         } catch (Exception e) {
@@ -109,7 +109,7 @@ public class TicketController {
                 redirectAttributes.addFlashAttribute("error", "Please log in to update ticket status");
                 return "redirect:/login";
             }
-            
+
             ticketService.updateStatus(id, status, user);
             redirectAttributes.addFlashAttribute("success", "Status updated successfully!");
         } catch (Exception e) {
@@ -126,7 +126,7 @@ public class TicketController {
                 model.addAttribute("error", "Please log in to view your tickets");
                 return "redirect:/login";
             }
-            
+
             model.addAttribute("tickets", ticketService.getTicketsForUser(user));
             model.addAttribute("user", user);
             return "user/support/my-tickets";
@@ -134,5 +134,22 @@ public class TicketController {
             model.addAttribute("error", "Error loading tickets: " + e.getMessage());
             return "user/support/my-tickets";
         }
+    }
+
+    @PostMapping("/{id}/delete")
+    public String deleteTicket(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            User user = getCurrentUser();
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "Please log in to delete tickets");
+                return "redirect:/login";
+            }
+
+            ticketService.deleteTicket(id, user);
+            redirectAttributes.addFlashAttribute("success", "Ticket deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error deleting ticket: " + e.getMessage());
+        }
+        return "redirect:/support/my-tickets";
     }
 }

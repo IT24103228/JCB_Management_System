@@ -10,4 +10,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByCustomer(User customer);
     List<Ticket> findByAssignedStaff(User staff);
     List<Ticket> findByFlaggedTrue();
+    List<Ticket> findByAssignedStaffIsNull();
 }
