@@ -20,25 +20,25 @@ public class PaymentSlip {
 
     private String filePath;
     private String status = "UPLOADED";
-    
+
     private LocalDateTime uploadedAt = LocalDateTime.now();
     private LocalDateTime verifiedAt;
-    
+
     private String verifiedBy;
     private String remarks;
-    
+
     public enum PaymentStatus {
         UPLOADED("Uploaded"),
         VERIFIED("Verified"),
         REJECTED("Rejected"),
         PENDING("Pending Review");
-        
+
         private final String displayName;
-        
+
         PaymentStatus(String displayName) {
             this.displayName = displayName;
         }
-        
+
         public String getDisplayName() {
             return displayName;
         }
