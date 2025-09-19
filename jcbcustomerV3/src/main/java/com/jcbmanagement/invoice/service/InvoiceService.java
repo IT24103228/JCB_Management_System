@@ -15,30 +15,30 @@ import java.util.Optional;
 public class InvoiceService {
     @Autowired
     private InvoiceRepository invoiceRepository;
-    
+
     @Autowired
     private PaymentSlipRepository paymentSlipRepository;
 
     public Invoice generateInvoice(Invoice invoice) {
         return invoiceRepository.save(invoice);
     }
-    
+
     public PaymentSlip savePaymentSlip(PaymentSlip paymentSlip) {
         return paymentSlipRepository.save(paymentSlip);
     }
-    
+
     public List<PaymentSlip> getAllPaymentSlips() {
         return paymentSlipRepository.findAll();
     }
-    
+
     public Optional<PaymentSlip> getPaymentSlipById(Long id) {
         return paymentSlipRepository.findById(id);
     }
-    
+
     public List<PaymentSlip> getPaymentSlipsByBooking(Long bookingId) {
         return paymentSlipRepository.findByBookingId(bookingId);
     }
-    
+
     public PaymentSlip verifyPaymentSlip(Long slipId, String verifiedBy, String status, String remarks) {
         Optional<PaymentSlip> slipOpt = paymentSlipRepository.findById(slipId);
         if (slipOpt.isPresent()) {

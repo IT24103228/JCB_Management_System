@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface PaymentSlipRepository extends JpaRepository<PaymentSlip, Long> {
     List<PaymentSlip> findByBookingId(Long bookingId);
-    
+
     List<PaymentSlip> findByStatus(String status);
 }
