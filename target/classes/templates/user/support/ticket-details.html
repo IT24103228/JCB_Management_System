@@ -14,7 +14,7 @@
     <div class="card-header">
         <h2 th:text="${ticket.subject}">Ticket Subject</h2>
         <small class="text-muted">
-            Category: <span th:text="${ticket.category?.displayName ?: 'N/A'}"></span> | 
+            Category: <span th:text="${ticket.category?.displayName ?: 'N/A'}"></span> |
             Status: <span th:text="${ticket.status}" class="badge bg-primary"></span>
             <span th:if="${ticket.flagged}" class="badge bg-warning ms-2">Flagged for Admin</span>
         </small>
@@ -57,7 +57,7 @@
 </div>
 
 <!-- Fixed role check from SUPPORT_STAFF to BOOKING_MANAGER and added ADMIN -->
-<div th:if="${#authentication.principal.role == 'BOOKING_MANAGER' or #authentication.principal.role == 'ADMIN'}" class="mt-4">
+<div th:if="${#authorization.expression('hasRole(''BOOKING_MANAGER'') or hasRole(''ADMIN'')')}" class="mt-4">
     <h5>Update Status</h5>
     <form th:action="@{/support/{id}/status(id=${ticket.ticketID})}" method="post" class="d-flex gap-2">
         <select name="status" class="form-select" style="width: auto;">
