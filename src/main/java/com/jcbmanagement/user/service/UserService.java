@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,5 +31,34 @@ public class UserService {
 
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    public User updateUserRole(Long userId, String newRole) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setRole(newRole.toUpperCase());
+            return userRepository.save(user);
+        }
+        throw new IllegalArgumentException("User not found with ID: " + userId);
+    }
+
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new IllegalArgumentException("User not found with ID: " + userId);
+        }
+        userRepository.deleteById(userId);
+    }
+
+    public List<User> getUsersByRole(String role) {
+        return userRepository.findByRole(role);
     }
 }
