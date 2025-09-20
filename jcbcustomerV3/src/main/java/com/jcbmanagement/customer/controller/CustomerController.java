@@ -26,7 +26,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -52,16 +55,75 @@ public class CustomerController {
     
     @GetMapping("/bookings")
     public String customerBookings(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        User customer = userService.findByUsername(username).orElse(null);
-        
-        if (customer != null) {
-            List<Booking> customerBookings = bookingService.getBookingsByCustomer(customer);
-            model.addAttribute("bookings", customerBookings);
+        try {
+            System.out.println("[v0] Customer bookings accessed");
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = auth.getName();
+            System.out.println("[v0] Username: " + username);
+            
+            User customer = userService.findByUsername(username).orElse(null);
+            
+            if (customer != null) {
+                System.out.println("[v0] Customer found: " + customer.getUsername());
+                System.out.println("[v0] Customer ID: " + customer.getUserID());
+                
+                List<Booking> customerBookings = bookingService.getBookingsByCustomer(customer);
+                System.out.println("[v0] Found " + customerBookings.size() + " bookings using customer object");
+                
+                // If no bookings found with customer object, try with customer ID
+                if (customerBookings.isEmpty()) {
+                    System.out.println("[v0] Trying to find bookings by customer ID: " + customer.getUserID());
+                    customerBookings = bookingService.getBookingsByCustomerId(customer.getUserID());
+                    System.out.println("[v0] Found " + customerBookings.size() + " bookings using customer ID");
+                }
+                
+                model.addAttribute("bookings", customerBookings);
+                
+                Map<Long, String> paymentStatusMap = new HashMap<>();
+                for (Booking booking : customerBookings) {
+                    try {
+                        List<PaymentSlip> paymentSlips = invoiceService.getPaymentSlipsByBooking(booking.getBookingID());
+                        if (paymentSlips.isEmpty()) {
+                            paymentStatusMap.put(booking.getBookingID(), "Payment Not Uploaded");
+                        } else {
+                            PaymentSlip latestSlip = paymentSlips.get(paymentSlips.size() - 1);
+                            String status = latestSlip.getStatus();
+                            switch (status) {
+                                case "UPLOADED":
+                                    paymentStatusMap.put(booking.getBookingID(), "Payment Pending Verification");
+                                    break;
+                                case "VERIFIED":
+                                    paymentStatusMap.put(booking.getBookingID(), "Payment Confirmed");
+                                    break;
+                                case "REJECTED":
+                                    paymentStatusMap.put(booking.getBookingID(), "Payment Rejected");
+                                    break;
+                                default:
+                                    paymentStatusMap.put(booking.getBookingID(), "Payment Not Confirmed");
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.out.println("[v0] Error processing payment status for booking " + booking.getBookingID() + ": " + e.getMessage());
+                        paymentStatusMap.put(booking.getBookingID(), "Payment Status Unknown");
+                    }
+                }
+                model.addAttribute("paymentStatusMap", paymentStatusMap);
+            } else {
+                System.out.println("[v0] Customer not found");
+                model.addAttribute("bookings", new ArrayList<>());
+                model.addAttribute("paymentStatusMap", new HashMap<>());
+            }
+            model.addAttribute("title", "My Bookings");
+            return "customer/bookings";
+        } catch (Exception e) {
+            System.out.println("[v0] Error in customer bookings: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("bookings", new ArrayList<>());
+            model.addAttribute("paymentStatusMap", new HashMap<>());
+            model.addAttribute("title", "My Bookings");
+            model.addAttribute("errorMessage", "Unable to load bookings. Please try again later.");
+            return "customer/bookings";
         }
-        model.addAttribute("title", "My Bookings");
-        return "customer/bookings";
     }
     
     @GetMapping("/bookings/new")
@@ -247,6 +309,48 @@ public class CustomerController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/customer/tickets/new";
+        }
+    }
+    
+    @GetMapping("/browse-machines")
+    public String browseMachines(Model model) {
+        try {
+            System.out.println("[v0] Browse machines accessed");
+            List<Machine> machines = machineService.getAvailableMachines();
+            System.out.println("[v0] Found " + machines.size() + " available machines");
+            model.addAttribute("machines", machines);
+            model.addAttribute("title", "Browse Available Machines");
+            return "customer/browse-machines";
+        } catch (Exception e) {
+            System.out.println("[v0] Error in browse machines: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("machines", new ArrayList<>());
+            model.addAttribute("title", "Browse Available Machines");
+            model.addAttribute("errorMessage", "Unable to load machines. Please try again later.");
+            return "customer/browse-machines";
+        }
+    }
+    
+    @GetMapping("/bookings/new/{machineId}")
+    public String newBookingFormWithMachine(@PathVariable Long machineId, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            System.out.println("[v0] New booking form accessed for machine: " + machineId);
+            Optional<Machine> machineOpt = machineService.getMachineById(machineId);
+            if (machineOpt.isEmpty()) {
+                System.out.println("[v0] Machine not found: " + machineId);
+                redirectAttributes.addFlashAttribute("errorMessage", "Selected machine not found");
+                return "redirect:/customer/browse-machines";
+            }
+            
+            model.addAttribute("booking", new Booking());
+            model.addAttribute("selectedMachine", machineOpt.get());
+            System.out.println("[v0] Machine loaded: " + machineOpt.get().getModel());
+            return "customer/new-booking-form";
+        } catch (Exception e) {
+            System.out.println("[v0] Error in new booking form: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Unable to load booking form. Please try again later.");
+            return "redirect:/customer/browse-machines";
         }
     }
 }

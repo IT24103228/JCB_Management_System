@@ -51,9 +51,10 @@
                                         <td th:text="${#temporals.format(booking.startDate, 'yyyy-MM-dd HH:mm')}"></td>
                                         <td th:text="${#temporals.format(booking.endDate, 'yyyy-MM-dd HH:mm')}"></td>
                                         <td>
-                                            <span th:class="'badge ' + (${booking.status.name()} == 'CONFIRMED' ? 'bg-success' : 
-                                                           ${booking.status.name()} == 'PENDING' ? 'bg-warning' : 
-                                                           ${booking.status.name()} == 'CANCELLED' ? 'bg-danger' : 'bg-secondary')"
+                                            <!-- Fixed Thymeleaf syntax for status badge conditional styling -->
+                                            <span th:class="${'badge ' + (booking.status.name() == 'CONFIRMED' ? 'bg-success' : 
+                                                           booking.status.name() == 'PENDING' ? 'bg-warning' : 
+                                                           booking.status.name() == 'CANCELLED' ? 'bg-danger' : 'bg-secondary')}"
                                                   th:text="${booking.status}"></span>
                                         </td>
                                         <td>

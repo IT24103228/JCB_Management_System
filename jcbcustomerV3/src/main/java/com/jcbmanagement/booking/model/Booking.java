@@ -15,12 +15,12 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookingID;
 
-    @ManyToOne
-    @JoinColumn(name = "CustomerID")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "CustomerID", referencedColumnName = "UserID")
     private User customer;
 
-    @ManyToOne
-    @JoinColumn(name = "MachineID")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MachineID", referencedColumnName = "MachineID")
     private Machine machine;
 
     private LocalDateTime startDate;

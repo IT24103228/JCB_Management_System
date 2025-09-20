@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,39 @@ public class MachineService {
     }
     
     public List<Machine> getAvailableMachines() {
-        return machineRepository.findAvailableMachines();
+        try {
+            System.out.println("[v0] Fetching available machines...");
+            
+            // Try the most reliable approach first - using availability flag
+            List<Machine> availableMachines = machineRepository.findAllAvailableMachinesNative();
+            
+            if (availableMachines.isEmpty()) {
+                System.out.println("[v0] No machines found with native query, trying JPA query...");
+                availableMachines = machineRepository.findByAvailabilityTrue();
+            }
+            
+            if (availableMachines.isEmpty()) {
+                System.out.println("[v0] No machines found with JPA query, trying status-based query...");
+                availableMachines = machineRepository.findAvailableMachinesNative();
+            }
+            
+            System.out.println("[v0] Found " + availableMachines.size() + " available machines");
+            
+            if (!availableMachines.isEmpty()) {
+                Machine firstMachine = availableMachines.get(0);
+                System.out.println("[v0] First machine - ID: " + firstMachine.getMachineID() + 
+                                 ", Status: " + firstMachine.getStatus() + 
+                                 ", Availability: " + firstMachine.isAvailability());
+            }
+            
+            return availableMachines;
+        } catch (Exception e) {
+            System.out.println("[v0] Error fetching available machines: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Final fallback - return empty list rather than crashing
+            return new ArrayList<>();
+        }
     }
     
     public Optional<Machine> getMachineById(Long id) {
@@ -39,6 +72,35 @@ public class MachineService {
         machineRepository.deleteById(id);
     }
     
+    public List<Machine> getMachinesByStatus(Machine.MachineStatus status) {
+        try {
+            // Convert enum to database string format
+            String dbStatus;
+            switch (status) {
+                case AVAILABLE: dbStatus = "Available"; break;
+                case IN_USE: dbStatus = "InUse"; break;
+                case MAINTENANCE: dbStatus = "Maintenance"; break;
+                case BOOKED: dbStatus = "Booked"; break;
+                case OUT_OF_SERVICE: dbStatus = "OutOfService"; break;
+                default: dbStatus = "Available"; break;
+            }
+            
+            return machineRepository.findMachinesByStatusNative(dbStatus);
+        } catch (Exception e) {
+            System.out.println("[v0] Error fetching machines by status: " + e.getMessage());
+            // Fallback to returning all machines and filtering in Java
+            return getAllMachines().stream()
+                    .filter(machine -> {
+                        try {
+                            return machine.getStatus() == status;
+                        } catch (Exception ex) {
+                            return false;
+                        }
+                    })
+                    .toList();
+        }
+    }
+    
     public Machine updateMachineStatus(Long machineId, Machine.MachineStatus status) {
         Optional<Machine> machineOpt = machineRepository.findById(machineId);
         if (machineOpt.isPresent()) {
@@ -48,10 +110,6 @@ public class MachineService {
             return machineRepository.save(machine);
         }
         throw new IllegalArgumentException("Machine not found with ID: " + machineId);
-    }
-    
-    public List<Machine> getMachinesByStatus(Machine.MachineStatus status) {
-        return machineRepository.findByStatus(status);
     }
     
     public List<Machine> getMachinesByModel(String model) {

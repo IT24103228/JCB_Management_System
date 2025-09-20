@@ -21,6 +21,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     
     List<Booking> findByStatus(Booking.BookingStatus status);
     
+    @Query("SELECT b FROM Booking b WHERE b.customer.userID = :customerId ORDER BY b.createdAt DESC")
+    List<Booking> findByCustomerUserIDOrdered(@Param("customerId") Long customerId);
+    
+    @Query("SELECT b FROM Booking b WHERE b.customer = :customer ORDER BY b.createdAt DESC")
+    List<Booking> findByCustomerOrdered(@Param("customer") User customer);
+    
+    @Query("SELECT b FROM Booking b " +
+           "JOIN FETCH b.customer c " +
+           "JOIN FETCH b.machine m " +
+           "ORDER BY b.createdAt DESC")
+    List<Booking> findAllWithCustomerAndMachine();
+    
     @Query("SELECT b FROM Booking b WHERE b.machine.machineID = :machineId " +
            "AND b.status != 'CANCELLED' " +
            "AND ((b.startDate <= :endDate AND b.endDate >= :startDate))")

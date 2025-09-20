@@ -91,4 +91,34 @@ public class BookingController {
         }
         return "redirect:/booking/" + id;
     }
+    
+    @GetMapping("/pending")
+    public String pendingBookings(Model model) {
+        List<Booking> pendingBookings = bookingService.getPendingBookings();
+        model.addAttribute("bookings", pendingBookings);
+        model.addAttribute("title", "Pending Bookings");
+        return "booking/pending";
+    }
+    
+    @PostMapping("/{id}/approve")
+    public String approveBooking(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            bookingService.updateBookingStatus(id, Booking.BookingStatus.CONFIRMED);
+            redirectAttributes.addFlashAttribute("successMessage", "Booking approved successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/booking/pending";
+    }
+    
+    @PostMapping("/{id}/reject")
+    public String rejectBooking(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            bookingService.updateBookingStatus(id, Booking.BookingStatus.CANCELLED);
+            redirectAttributes.addFlashAttribute("successMessage", "Booking rejected successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/booking/pending";
+    }
 }

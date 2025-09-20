@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,13 +36,53 @@ public class BookingService {
     }
     
     public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
+        try {
+            System.out.println("[v0] Getting all bookings with customer and machine details");
+            List<Booking> bookings = bookingRepository.findAllWithCustomerAndMachine();
+            System.out.println("[v0] Repository returned " + bookings.size() + " bookings");
+            
+            // Fallback to regular findAll if custom query fails
+            if (bookings.isEmpty()) {
+                System.out.println("[v0] Trying fallback findAll method");
+                bookings = bookingRepository.findAll();
+                System.out.println("[v0] Fallback returned " + bookings.size() + " bookings");
+            }
+            
+            return bookings;
+        } catch (Exception e) {
+            System.out.println("[v0] Error in getAllBookings: " + e.getMessage());
+            e.printStackTrace();
+            // Fallback to basic findAll
+            return bookingRepository.findAll();
+        }
     }
     
     public List<Booking> getBookingsByCustomer(User customer) {
-        return bookingRepository.findByCustomer(customer);
+        try {
+            System.out.println("[v0] Getting bookings for customer: " + customer.getUsername() + " (ID: " + customer.getUserID() + ")");
+            List<Booking> bookings = bookingRepository.findByCustomer(customer);
+            System.out.println("[v0] Repository returned " + bookings.size() + " bookings");
+            return bookings;
+        } catch (Exception e) {
+            System.out.println("[v0] Error in getBookingsByCustomer: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
     
+    public List<Booking> getBookingsByCustomerId(Long customerId) {
+        try {
+            System.out.println("[v0] Getting bookings for customer ID: " + customerId);
+            List<Booking> bookings = bookingRepository.findByCustomerUserID(customerId);
+            System.out.println("[v0] Repository returned " + bookings.size() + " bookings by customer ID");
+            return bookings;
+        } catch (Exception e) {
+            System.out.println("[v0] Error in getBookingsByCustomerId: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
     public Optional<Booking> getBookingById(Long id) {
         return bookingRepository.findById(id);
     }
@@ -99,6 +140,18 @@ public class BookingService {
         } else {
             throw new IllegalArgumentException("Booking not found with ID: " + bookingId);
         }
+    }
+    
+    public List<Booking> getPendingBookings() {
+        return bookingRepository.findByStatus(Booking.BookingStatus.PENDING);
+    }
+    
+    public long countBookingsByStatus(Booking.BookingStatus status) {
+        return bookingRepository.findByStatus(status).size();
+    }
+    
+    public long countTotalBookings() {
+        return bookingRepository.count();
     }
     
     private void validateBooking(Booking booking) {

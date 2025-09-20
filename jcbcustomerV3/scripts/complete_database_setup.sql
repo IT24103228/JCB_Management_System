@@ -74,7 +74,7 @@ CREATE TABLE Tickets (
     AssignedStaffID BIGINT FOREIGN KEY REFERENCES Users(UserID),
     Subject VARCHAR(255) NOT NULL,
     Description TEXT NOT NULL,
-    Status VARCHAR(50) NOT NULL,     -- e.g., 'Open', 'InProgress', 'Resolved'
+    Status VARCHAR(50) NOT NULL DEFAULT 'in progress',     -- Updated default status and values: 'in progress' or 'solved'
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE()
 );
@@ -124,8 +124,13 @@ IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_tickets_flagged')
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_tickets_category')
     CREATE INDEX idx_tickets_category ON Tickets(category);
 
--- Update existing tickets to have default category
-UPDATE Tickets SET category = 'BOOKING' WHERE category IS NULL;
+-- Update existing tickets to use new status values
+UPDATE Tickets SET Status = 'in progress' WHERE Status IN ('Open', 'InProgress', 'OPEN', 'IN_PROGRESS');
+UPDATE Tickets SET Status = 'solved' WHERE Status IN ('Resolved', 'Closed', 'RESOLVED', 'CLOSED');
+
+-- Add constraint to ensure only valid status values
+IF NOT EXISTS (SELECT * FROM sys.check_constraints WHERE name = 'CK_Tickets_Status')
+    ALTER TABLE Tickets ADD CONSTRAINT CK_Tickets_Status CHECK (Status IN ('in progress', 'solved'));
 
 -- Insert sample data for testing (optional)
 -- Sample users
