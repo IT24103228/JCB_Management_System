@@ -1,76 +1,148 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Machine Inventory - JCB Management System</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard">JCB Management System</a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/dashboard">Dashboard</a>
-                <a class="nav-link" href="/logout">Logout</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/dashboard">JCB Management System</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/dashboard">Dashboard</a>
+            <a class="nav-link" href="/logout">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Machine Inventory</h2>
+                <!-- Hide "Add Machine" button for available, in use, and maintenance views -->
+                <a href="/inventory/new" class="btn btn-primary"
+                   th:if="${title == null or (title != 'Available Machines (Not Booked)' and title != 'Machines In Use' and title != 'Machines Under Maintenance')}">Add Machine</a>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <div class="container-fluid mt-4">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2>Machine Inventory</h2>
-                    <a href="/inventory/new" class="btn btn-primary">Add Machine</a>
-                </div>
-            </div>
-        </div>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Model</th>
+                                <th>Serial Number</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="machine : ${machines}">
+                                <td th:text="${machine.machineID}"></td>
+                                <td th:text="${machine.model}"></td>
+                                <td th:text="${machine.serialNumber}"></td>
+                                <td th:text="${machine.location}"></td>
+                                <td>
+                                    <!-- Fixed Thymeleaf expression syntax for status badge -->
+                                    <span th:class="'badge ' + (${machine.status.name()} == 'AVAILABLE' ? 'bg-success' : (${machine.status.name()} == 'IN_USE' ? 'bg-warning' : (${machine.status.name()} == 'MAINTENANCE' ? 'bg-danger' : 'bg-secondary')))"
+                                          th:text="${machine.status}"></span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/inventory/{id}(id=${machine.machineID})}" class="btn btn-sm btn-outline-primary">View</a>
 
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Model</th>
-                                        <th>Serial Number</th>
-                                        <th>Location</th>
-                                        <th>Status</th>
-                                        <th>Availability</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="machine : ${machines}">
-                                        <td th:text="${machine.machineID}"></td>
-                                        <td th:text="${machine.model}"></td>
-                                        <td th:text="${machine.serialNumber}"></td>
-                                        <td th:text="${machine.location}"></td>
-                                        <td>
-                                            <span th:class="'badge ' + (${machine.status.name()} == 'AVAILABLE' ? 'bg-success' : 
-                                                           ${machine.status.name()} == 'IN_USE' ? 'bg-warning' : 
-                                                           ${machine.status.name()} == 'MAINTENANCE' ? 'bg-danger' : 'bg-secondary')"
-                                                  th:text="${machine.status}"></span>
-                                        </td>
-                                        <td>
-                                            <span th:class="'badge ' + (${machine.availability} ? 'bg-success' : 'bg-danger')"
-                                                  th:text="${machine.availability ? 'Available' : 'Not Available'}"></span>
-                                        </td>
-                                        <td>
-                                            <a th:href="@{/inventory/{id}(id=${machine.machineID})}" class="btn btn-sm btn-outline-primary">View</a>
-                                            <a th:href="@{/inventory/{id}/edit(id=${machine.machineID})}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                    <!-- Hide "Edit" button for available and in use views -->
+                                    <a th:href="@{/inventory/{id}/edit(id=${machine.machineID})}" class="btn btn-sm btn-outline-secondary"
+                                       th:if="${title == null or (title != 'Available Machines (Not Booked)' and title != 'Machines In Use')}">Edit</a>
+
+                                    <!-- Hide "Delete" button for available and in use views, show only for view all and maintenance -->
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
+                                            th:if="${title == null or (title != 'Available Machines (Not Booked)' and title != 'Machines In Use')}"
+                                            th:data-machine-id="${machine.machineID}"
+                                            th:data-machine-model="${machine.model}">Delete</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Fixed Bootstrap 5 modal with proper syntax -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete machine <strong id="machineModel"></strong>?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners to all delete buttons
+        document.querySelectorAll('.delete-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const machineId = this.getAttribute('data-machine-id');
+                const machineModel = this.getAttribute('data-machine-model');
+                confirmDelete(machineId, machineModel);
+            });
+        });
+    });
+
+    function confirmDelete(machineId, machineModel) {
+        if (!machineId || !machineModel) {
+            alert('Error: Missing machine information');
+            return;
+        }
+
+        // Set the machine model in the modal
+        document.getElementById('machineModel').textContent = machineModel;
+
+        // Set the form action
+        const deleteForm = document.getElementById('deleteForm');
+        deleteForm.action = '/inventory/' + machineId + '/delete';
+
+        try {
+            // Show the Bootstrap modal
+            const modalElement = document.getElementById('deleteModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } catch (error) {
+            console.error('Error showing modal:', error);
+            // Fallback to browser confirm
+            if (confirm('Are you sure you want to delete machine "' + machineModel + '"? This action cannot be undone.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/inventory/' + machineId + '/delete';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    }
+</script>
 </body>
 </html>
