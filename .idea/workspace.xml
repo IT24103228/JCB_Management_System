@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30d6c79f-a3aa-400f-8e0d-a5959ca67053" name="Changes" comment="booking management update">
-      <change afterPath="$PROJECT_DIR$/jcbcustomerV3/scripts/complete_database_setup_sqlserver.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/jcbcustomerV3/src/main/resources/templates/booking/view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerV3/src/main/java/com/jcbmanagement/booking/model/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/jcbcustomerV3/src/main/java/com/jcbmanagement/booking/model/Booking.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerV3/src/main/java/com/jcbmanagement/booking/repository/BookingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/jcbcustomerV3/src/main/java/com/jcbmanagement/booking/repository/BookingRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerV3/src/main/java/com/jcbmanagement/booking/service/BookingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/jcbcustomerV3/src/main/java/com/jcbmanagement/booking/service/BookingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerV3/src/main/java/com/jcbmanagement/customer/controller/CustomerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/jcbcustomerV3/src/main/java/com/jcbmanagement/customer/controller/CustomerController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerV3/src/main/resources/templates/booking/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/jcbcustomerV3/src/main/resources/templates/booking/list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerV3/src/main/resources/templates/customer/bookings.html" beforeDir="false" afterPath="$PROJECT_DIR$/jcbcustomerV3/src/main/resources/templates/customer/bookings.html" afterDir="false" />
-    </list>
+    <list default="true" id="30d6c79f-a3aa-400f-8e0d-a5959ca67053" name="Changes" comment="booking management update" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -70,7 +61,6 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.JcbManagementSystemApplication.executor": "Run",
-    "git-widget-placeholder": "Dimuthu",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -82,7 +72,8 @@
 }]]></component>
   <component name="RunManager">
     <configuration name="JcbManagementSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="jcb-management" />
+      <option name="ALTERNATIVE_JRE_PATH" value="ms-17" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.jcbmanagement.JcbManagementSystemApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
