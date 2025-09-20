@@ -4,7 +4,11 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
+<<<<<<< Updated upstream
         <option value="$PROJECT_DIR$/jcbcustomerV3/pom.xml" />
+=======
+        <option value="$PROJECT_DIR$/pom.xml" />
+>>>>>>> Stashed changes
       </list>
     </option>
   </component>
