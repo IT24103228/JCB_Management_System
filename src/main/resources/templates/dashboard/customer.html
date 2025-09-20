@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Customer Dashboard - JCB Management System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">JCB Management System</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">Welcome, <span th:text="${user.username}"></span> (Customer)</span>
+                <a class="nav-link" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Customer Dashboard</h2>
+                <p class="text-muted">Manage your bookings and view machine availability</p>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>My Bookings</h5>
+                                <p>View and manage</p>
+                            </div>
+                            <i class="bi bi-calendar-check fs-1"></i>
+                        </div>
+                        <a href="/customer/bookings" class="btn btn-light btn-sm mt-2">View Bookings</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <!-- Updated text to match new browse machines functionality -->
+                                <h5>Browse Machines</h5>
+                                <p>View available machines and book</p>
+                            </div>
+                            <i class="bi bi-truck fs-1"></i>
+                        </div>
+                        <!-- Updated link to new browse machines page -->
+                        <a href="/customer/browse-machines" class="btn btn-light btn-sm mt-2">Browse Machines</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5>Support Tickets</h5>
+                                <p>Get help</p>
+                            </div>
+                            <i class="bi bi-headset fs-1"></i>
+                        </div>
+                        <a href="/support/my-tickets" class="btn btn-light btn-sm mt-2">Support</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

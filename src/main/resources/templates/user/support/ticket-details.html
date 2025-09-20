@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Ticket Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-4">
+
+<!-- Added error and success message display -->
+<div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+<div th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 th:text="${ticket.subject}">Ticket Subject</h2>
+        <small class="text-muted">
+            Category: <span th:text="${ticket.category?.displayName ?: 'N/A'}"></span> | 
+            Status: <span th:text="${ticket.status}" class="badge bg-primary"></span>
+            <span th:if="${ticket.flagged}" class="badge bg-warning ms-2">Flagged for Admin</span>
+        </small>
+    </div>
+    <div class="card-body">
+        <p th:text="${ticket.description}">Ticket Description</p>
+        <small class="text-muted">
+            Created: <span th:text="${#temporals.format(ticket.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+            <span th:if="${ticket.assignedStaff}">
+                | Assigned to: <span th:text="${ticket.assignedStaff.username}"></span>
+            </span>
+        </small>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h4>Responses</h4>
+    <div th:if="${#lists.isEmpty(responses)}" class="alert alert-info">
+        No responses yet.
+    </div>
+    <div th:each="response : ${responses}" class="card mb-2">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <strong th:text="${response.user.username}">Username</strong>
+                <small class="text-muted" th:text="${#temporals.format(response.createdAt, 'yyyy-MM-dd HH:mm')}">Date</small>
+            </div>
+            <p th:text="${response.message}" class="mt-2">Response message</p>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h5>Add Response</h5>
+    <form th:action="@{/support/{id}/respond(id=${ticket.ticketID})}" method="post">
+        <div class="mb-3">
+            <textarea name="message" class="form-control" rows="3" placeholder="Enter your response..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Response</button>
+    </form>
+</div>
+
+<!-- Fixed role check from SUPPORT_STAFF to BOOKING_MANAGER and added ADMIN -->
+<div th:if="${#authentication.principal.role == 'BOOKING_MANAGER' or #authentication.principal.role == 'ADMIN'}" class="mt-4">
+    <h5>Update Status</h5>
+    <form th:action="@{/support/{id}/status(id=${ticket.ticketID})}" method="post" class="d-flex gap-2">
+        <select name="status" class="form-select" style="width: auto;">
+            <option value="OPEN" th:selected="${ticket.status == 'OPEN'}">Open</option>
+            <option value="IN_PROGRESS" th:selected="${ticket.status == 'IN_PROGRESS'}">In Progress</option>
+            <option value="RESOLVED" th:selected="${ticket.status == 'RESOLVED'}">Resolved</option>
+            <option value="CLOSED" th:selected="${ticket.status == 'CLOSED'}">Closed</option>
+        </select>
+        <button type="submit" class="btn btn-warning">Update Status</button>
+    </form>
+</div>
+
+<div class="mt-4">
+    <a th:href="@{/support/my-tickets}" class="btn btn-secondary">Back to My Tickets</a>
+</div>
+
+</body>
+</html>
