@@ -61,4 +61,31 @@ public class UserService {
     public List<User> getUsersByRole(String role) {
         return userRepository.findByRole(role);
     }
+
+    public User updateCustomerAccount(Long userId, String username, String email, String password) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+
+            if (!user.getUsername().equals(username)) {
+                Optional<User> existingUser = userRepository.findByUsername(username);
+                if (existingUser.isPresent() && !existingUser.get().getUserID().equals(userId)) {
+                    throw new IllegalArgumentException("Username already exists");
+                }
+                user.setUsername(username);
+            }
+
+            // Update email
+            user.setEmail(email);
+
+            if (password != null && !password.trim().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(password));
+            }
+
+            // Note: Role is NOT updated - customers cannot change their own role
+
+            return userRepository.save(user);
+        }
+        throw new IllegalArgumentException("User not found with ID: " + userId);
+    }
 }
