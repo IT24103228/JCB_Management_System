@@ -30,21 +30,21 @@ public class TicketService {
         if (currentUser == null) {
             throw new IllegalArgumentException("User must be logged in to create a ticket");
         }
-        
+
         if (currentUser.getUserID() == null) {
             throw new IllegalArgumentException("User ID is required");
         }
-        
-        if (ticket.getSubject() == null || ticket.getDescription() == null || 
-            ticket.getSubject().trim().isEmpty() || ticket.getDescription().trim().isEmpty()) {
+
+        if (ticket.getSubject() == null || ticket.getDescription() == null ||
+                ticket.getSubject().trim().isEmpty() || ticket.getDescription().trim().isEmpty()) {
             throw new IllegalArgumentException("Subject and description are required");
         }
-        
+
         ticket.setCustomer(currentUser);
         ticket.setAssignedStaff(assignStaff());
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setUpdatedAt(LocalDateTime.now());
-        
+
         return ticketRepository.save(ticket);
     }
 
@@ -64,7 +64,7 @@ public class TicketService {
         if (currentUser == null) {
             throw new IllegalArgumentException("User must be logged in to add a response");
         }
-        
+
         if (message == null || message.trim().isEmpty()) {
             throw new IllegalArgumentException("Message is required");
         }
@@ -73,15 +73,15 @@ public class TicketService {
             throw new IllegalArgumentException("Ticket not found");
         }
         Ticket ticket = optTicket.get();
-        
-        boolean isAuthorized = ticket.getCustomer().equals(currentUser) || 
-                              (ticket.getAssignedStaff() != null && ticket.getAssignedStaff().equals(currentUser)) ||
-                              "ADMIN".equals(currentUser.getRole());
-        
+
+        boolean isAuthorized = ticket.getCustomer().equals(currentUser) ||
+                (ticket.getAssignedStaff() != null && ticket.getAssignedStaff().equals(currentUser)) ||
+                "ADMIN".equals(currentUser.getRole());
+
         if (!isAuthorized) {
             throw new SecurityException("Not authorized to respond to this ticket");
         }
-        
+
         TicketResponse response = new TicketResponse();
         response.setTicket(ticket);
         response.setUser(currentUser);
@@ -96,91 +96,99 @@ public class TicketService {
         if (currentUser == null) {
             throw new IllegalArgumentException("User must be logged in to update ticket status");
         }
-        
+
         Optional<Ticket> optTicket = ticketRepository.findById(ticketId);
         if (optTicket.isEmpty()) {
             throw new IllegalArgumentException("Ticket not found");
         }
-        
+
         Ticket ticket = optTicket.get();
-        
+
         // Allow booking managers and admins to update status
         if (!currentUser.getRole().equals("BOOKING_MANAGER") && !currentUser.getRole().equals("ADMIN")) {
             throw new IllegalArgumentException("Not authorized to update ticket status");
         }
-        
+
         ticket.setStatus(status);
         ticket.setUpdatedAt(LocalDateTime.now());
         return ticketRepository.save(ticket);
     }
-    
+
     public Ticket flagTicketForAdmin(Long ticketId, User currentUser) {
         Optional<Ticket> optTicket = ticketRepository.findById(ticketId);
         if (optTicket.isEmpty()) {
             throw new IllegalArgumentException("Ticket not found");
         }
-        
+
         Ticket ticket = optTicket.get();
-        
+
         // Only booking managers can flag tickets for admin
         if (!currentUser.getRole().equals("BOOKING_MANAGER")) {
             throw new IllegalArgumentException("Not authorized to flag tickets");
         }
-        
+
         ticket.setFlagged(true);
         ticket.setUpdatedAt(LocalDateTime.now());
         return ticketRepository.save(ticket);
     }
-    
+
     public Ticket unflagTicket(Long ticketId, User currentUser) {
         Optional<Ticket> optTicket = ticketRepository.findById(ticketId);
         if (optTicket.isEmpty()) {
             throw new IllegalArgumentException("Ticket not found");
         }
-        
+
         Ticket ticket = optTicket.get();
-        
+
         // Only admins can unflag tickets
         if (!currentUser.getRole().equals("ADMIN")) {
             throw new IllegalArgumentException("Not authorized to unflag tickets");
         }
-        
+
         ticket.setFlagged(false);
         ticket.setUpdatedAt(LocalDateTime.now());
         return ticketRepository.save(ticket);
     }
-    
+
     public Ticket reassignTicket(Long ticketId, Long newStaffId, User currentUser) {
         Optional<Ticket> optTicket = ticketRepository.findById(ticketId);
         if (optTicket.isEmpty()) {
             throw new IllegalArgumentException("Ticket not found");
         }
-        
+
         Optional<User> newStaffOpt = userRepository.findById(newStaffId);
         if (newStaffOpt.isEmpty()) {
             throw new IllegalArgumentException("Staff member not found");
         }
-        
+
         Ticket ticket = optTicket.get();
         User newStaff = newStaffOpt.get();
-        
+
         // Only admins can reassign tickets
         if (!currentUser.getRole().equals("ADMIN")) {
             throw new IllegalArgumentException("Not authorized to reassign tickets");
         }
-        
+
         // Ensure new staff is a booking manager
         if (!newStaff.getRole().equals("BOOKING_MANAGER")) {
             throw new IllegalArgumentException("Can only assign tickets to booking managers");
         }
-        
+
         ticket.setAssignedStaff(newStaff);
         ticket.setUpdatedAt(LocalDateTime.now());
         return ticketRepository.save(ticket);
     }
-    
+
     public List<Ticket> getFlaggedTickets() {
         return ticketRepository.findByFlaggedTrue();
+    }
+
+    public long countTotalTickets() {
+        return ticketRepository.count();
+    }
+
+    public long countFlaggedTickets() {
+        return ticketRepository.findByFlaggedTrue().size();
     }
 
     public List<Ticket> getAllTickets() {
@@ -191,7 +199,7 @@ public class TicketService {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
-        
+
         if ("CUSTOMER".equals(user.getRole())) {
             return ticketRepository.findByCustomer(user);
         } else if ("BOOKING_MANAGER".equals(user.getRole())) {
@@ -210,14 +218,14 @@ public class TicketService {
         if (user == null) {
             return Optional.empty();
         }
-        
+
         Optional<Ticket> optTicket = ticketRepository.findById(id);
         if (optTicket.isPresent()) {
             Ticket ticket = optTicket.get();
-            boolean hasAccess = ticket.getCustomer().equals(user) || 
-                               (ticket.getAssignedStaff() != null && ticket.getAssignedStaff().equals(user)) ||
-                               "ADMIN".equals(user.getRole());
-            
+            boolean hasAccess = ticket.getCustomer().equals(user) ||
+                    (ticket.getAssignedStaff() != null && ticket.getAssignedStaff().equals(user)) ||
+                    "ADMIN".equals(user.getRole());
+
             if (hasAccess) {
                 return optTicket;
             }
@@ -229,19 +237,19 @@ public class TicketService {
         if (currentUser == null) {
             throw new IllegalArgumentException("User must be logged in to delete a ticket");
         }
-        
+
         Optional<Ticket> optTicket = ticketRepository.findById(ticketId);
         if (optTicket.isEmpty()) {
             throw new IllegalArgumentException("Ticket not found");
         }
-        
+
         Ticket ticket = optTicket.get();
-        
+
         // Only allow customers to delete their own tickets
         if (!ticket.getCustomer().equals(currentUser)) {
             throw new SecurityException("You can only delete your own tickets");
         }
-        
+
         // Delete the ticket (this will cascade delete responses due to CascadeType.ALL)
         ticketRepository.deleteById(ticketId);
     }

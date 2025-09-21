@@ -27,6 +27,24 @@ public class User {
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     private String username;
 
+    @Column(name = "FirstName", nullable = false)
+    @NotBlank(message = "First name is required")
+    @Size(max = 50, message = "First name must not exceed 50 characters")
+    private String firstName;
+
+    @Column(name = "LastName", nullable = false)
+    @NotBlank(message = "Last name is required")
+    @Size(max = 50, message = "Last name must not exceed 50 characters")
+    private String lastName;
+
+    @Column(name = "ContactNumber")
+    @Size(max = 20, message = "Contact number must not exceed 20 characters")
+    private String contactNumber;
+
+    @Column(name = "Address")
+    @Size(max = 255, message = "Address must not exceed 255 characters")
+    private String address;
+
     @Column(name = "Password", nullable = false)
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
@@ -40,7 +58,7 @@ public class User {
     @Email(message = "Please provide a valid email address")
     @NotBlank(message = "Email is required")
     private String email;
-    
+
     @Column(name = "CreatedAt", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

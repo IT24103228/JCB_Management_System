@@ -17,16 +17,24 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User registerUser(String username, String password, String role, String email) {
+    public User registerUser(String firstName, String lastName, String username, String password, String role, String email, String contactNumber, String address) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }
         User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));  // Hash password
         user.setRole(role);
         user.setEmail(email);
+        user.setContactNumber(contactNumber);
+        user.setAddress(address);
         return userRepository.save(user);
+    }
+
+    public User registerUser(String username, String password, String role, String email) {
+        return registerUser("", "", username, password, role, email, null, null);
     }
 
     public Optional<User> findByUsername(String username) {
@@ -60,6 +68,10 @@ public class UserService {
 
     public List<User> getUsersByRole(String role) {
         return userRepository.findByRole(role);
+    }
+
+    public long countTotalUsers() {
+        return userRepository.count();
     }
 
     public User updateCustomerAccount(Long userId, String username, String email, String password) {
