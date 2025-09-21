@@ -47,6 +47,9 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Contact Number</th>
+                                <th>Address</th>
                                 <th>Email</th>
                                 <th>Role</th>
                                 <th>Created At</th>
@@ -57,6 +60,9 @@
                             <tr th:each="user : ${users}">
                                 <td th:text="${user.userID}"></td>
                                 <td th:text="${user.username}"></td>
+                                <td th:text="${user.firstName + ' ' + user.lastName}"></td>
+                                <td th:text="${user.contactNumber ?: 'N/A'}"></td>
+                                <td th:text="${user.address ?: 'N/A'}"></td>
                                 <td th:text="${user.email}"></td>
                                 <td>
                                             <span class="badge"

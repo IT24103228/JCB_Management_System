@@ -21,43 +21,53 @@
 <div class="container">
     <div class="register-container bg-white">
         <h2 class="text-center mb-4 text-primary">Register - JCB Management System</h2>
-        
+
         <form th:action="@{/register}" method="post">
+            <!-- Added first name and last name fields -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">First Name:</label>
+                    <input name="firstName" class="form-control" required maxlength="50">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Last Name:</label>
+                    <input name="lastName" class="form-control" required maxlength="50">
+                </div>
+            </div>
+
             <div class="mb-3">
                 <label class="form-label">Username:</label>
                 <input name="username" class="form-control" required minlength="3" maxlength="50">
             </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Password:</label>
-                <input type="password" name="password" class="form-control" required minlength="6">
-            </div>
-            
-            <!-- Updated role field to dropdown with specific roles -->
-            <div class="mb-3">
-                <label class="form-label">Role:</label>
-                <select name="role" class="form-select" required>
-                    <option value="">Select your role...</option>
-                    <option value="customer">Customer</option>
-                    <option value="admin">Admin</option>
-                    <option value="finance officer">Finance Officer</option>
-                    <option value="booking manager">Booking Manager</option>
-                    <option value="inventory manager">Inventory Manager</option>
-                    <option value="maintenance supervisor">Maintenance Supervisor</option>
-                </select>
-            </div>
-            
+
             <div class="mb-3">
                 <label class="form-label">Email:</label>
                 <input type="email" name="email" class="form-control" required>
             </div>
-            
+
+            <!-- Added contact number field -->
+            <div class="mb-3">
+                <label class="form-label">Contact Number:</label>
+                <input name="contactNumber" class="form-control" maxlength="20" placeholder="Optional">
+            </div>
+
+            <!-- Added address field -->
+            <div class="mb-3">
+                <label class="form-label">Address:</label>
+                <textarea name="address" class="form-control" rows="3" maxlength="255" placeholder="Optional"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password:</label>
+                <input type="password" name="password" class="form-control" required minlength="6">
+            </div>
+
             <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
         </form>
-        
+
         <div th:if="${error}" class="alert alert-danger" th:text="'Error: ' + ${error}"></div>
         <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
-        
+
         <div class="text-center">
             <a href="/login" class="text-decoration-none">Already have an account? Login here</a>
         </div>

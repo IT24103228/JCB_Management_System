@@ -128,4 +128,8 @@ public class MachineService {
     public List<Machine> getMachinesByLocation(String location) {
         return machineRepository.findByLocation(location);
     }
+
+    public long countTotalMachines() {
+        return machineRepository.count();
+    }
 }

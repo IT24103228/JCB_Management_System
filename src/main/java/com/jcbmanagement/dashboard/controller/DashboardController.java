@@ -5,6 +5,7 @@ import com.jcbmanagement.user.service.UserService;
 import com.jcbmanagement.booking.model.Booking;
 import com.jcbmanagement.booking.service.BookingService;
 import com.jcbmanagement.inventory.service.MachineService;
+import com.jcbmanagement.support.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class DashboardController {
-    
+
     @Autowired
     private UserService userService;
 
@@ -24,10 +25,33 @@ public class DashboardController {
     @Autowired
     private MachineService machineService;
 
+    @Autowired
+    private TicketService ticketService;
+
     @GetMapping("/admin/dashboard")
     public String adminDashboard(Model model) {
-        addUserToModel(model);
-        return "dashboard/admin";
+        try {
+            addUserToModel(model);
+
+            model.addAttribute("totalUsers", userService.countTotalUsers());
+            model.addAttribute("totalBookings", bookingService.countTotalBookings());
+            model.addAttribute("totalTickets", ticketService.countTotalTickets());
+            model.addAttribute("flaggedTickets", ticketService.countFlaggedTickets());
+            model.addAttribute("totalMachines", machineService.countTotalMachines());
+            model.addAttribute("pendingPayments", 0); // Placeholder for future payment system
+
+            return "dashboard/admin";
+        } catch (Exception e) {
+            addUserToModel(model);
+            // Fallback values if services fail
+            model.addAttribute("totalUsers", 0);
+            model.addAttribute("totalBookings", 0);
+            model.addAttribute("totalTickets", 0);
+            model.addAttribute("flaggedTickets", 0);
+            model.addAttribute("totalMachines", 0);
+            model.addAttribute("pendingPayments", 0);
+            return "dashboard/admin";
+        }
     }
 
     @GetMapping("/finance/dashboard")
@@ -40,11 +64,11 @@ public class DashboardController {
     public String bookingDashboard(Model model) {
         try {
             addUserToModel(model);
-            
+
             model.addAttribute("totalBookings", bookingService.countTotalBookings());
             model.addAttribute("pendingBookings", bookingService.countBookingsByStatus(Booking.BookingStatus.PENDING));
             model.addAttribute("availableMachines", machineService.getAvailableMachines().size());
-            
+
             return "dashboard/booking";
         } catch (Exception e) {
             addUserToModel(model);
@@ -86,15 +110,15 @@ public class DashboardController {
                 model.addAttribute("user", new User());
                 return;
             }
-            
+
             String username = auth.getName();
-            
+
             User user = userService.findByUsername(username).orElse(null);
             if (user == null) {
                 user = new User();
                 user.setUsername(username);
             }
-            
+
             model.addAttribute("user", user);
         } catch (Exception e) {
             // Fallback: add a default user object

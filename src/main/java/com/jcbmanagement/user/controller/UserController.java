@@ -23,9 +23,9 @@ public class UserController {
 
     @PostMapping("/register")
     public String register(@RequestParam String username, @RequestParam String password,
-                           @RequestParam String role, @RequestParam String email, Model model) {
+                           @RequestParam String email, Model model) {
         try {
-            String normalizedRole = role.toUpperCase().replace(" ", "_");
+            String normalizedRole = "CUSTOMER";
             userService.registerUser(username, password, normalizedRole, email);
             model.addAttribute("message", "Registration successful! Please login.");
             return "user/login";
@@ -45,7 +45,7 @@ public class UserController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         User user = userService.findByUsername(username).orElse(null);
-        
+
         if (user != null) {
             String role = user.getRole();
             switch (role) {
