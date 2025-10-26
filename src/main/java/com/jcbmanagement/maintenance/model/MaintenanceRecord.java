@@ -19,4 +19,16 @@ public class MaintenanceRecord {
 
     private LocalDateTime maintenanceDate = LocalDateTime.now();
     private String description;
+
+    private LocalDateTime startDate;
+    private LocalDateTime endDate; // Completion is implied by this being set
+
+    @Column(name = "CreatedBy", nullable = false)
+    private String createdBy;
+
+    @Column(name = "CreatedAt")
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "NextDueDate")
+    private LocalDateTime nextDueDate;
 }

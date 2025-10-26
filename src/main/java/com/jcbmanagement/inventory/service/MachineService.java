@@ -4,6 +4,7 @@ import com.jcbmanagement.booking.model.Booking;
 import com.jcbmanagement.booking.repository.BookingRepository;
 import com.jcbmanagement.inventory.model.Machine;
 import com.jcbmanagement.inventory.repository.MachineRepository;
+import com.jcbmanagement.maintenance.repository.MaintenanceRecordRepository; // Import MaintenanceRecordRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -21,6 +23,9 @@ public class MachineService {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private MaintenanceRecordRepository maintenanceRecordRepository; // Inject MaintenanceRecordRepository
 
     public Machine addMachine(Machine machine) {
         return machineRepository.save(machine);
@@ -32,23 +37,20 @@ public class MachineService {
 
     public List<Machine> getAvailableMachines() {
         try {
-            System.out.println("[v0] Fetching truly available machines (excluding booked ones)...");
-
-            // Get all machines that are not booked or in use
             List<Machine> allMachines = machineRepository.findAll();
             List<Machine> availableMachines = new ArrayList<>();
 
             for (Machine machine : allMachines) {
-                // Check if machine has any active bookings
+                // Check for active (non-cancelled) bookings
                 List<Booking> activeBookings = bookingRepository.findConflictingBookings(
                         machine.getMachineID(),
                         LocalDateTime.now(),
-                        LocalDateTime.now().plusDays(365) // Check for future bookings
+                        LocalDateTime.now().plusDays(365)
                 );
 
                 // Machine is available if:
                 // 1. Status is AVAILABLE
-                // 2. No active bookings exist
+                // 2. No active bookings exist (cancelled bookings are excluded by findConflictingBookings)
                 // 3. Availability flag is true
                 if (machine.getStatus() == Machine.MachineStatus.AVAILABLE &&
                         activeBookings.isEmpty() &&
@@ -57,13 +59,9 @@ public class MachineService {
                 }
             }
 
-            System.out.println("[v0] Found " + availableMachines.size() + " truly available machines");
             return availableMachines;
 
         } catch (Exception e) {
-            System.out.println("[v0] Error fetching available machines: " + e.getMessage());
-            e.printStackTrace();
-
             // Fallback to basic availability check
             return machineRepository.findByAvailabilityTrue();
         }
@@ -78,19 +76,27 @@ public class MachineService {
     }
 
     public void deleteMachine(Long id) {
+        // Check if there are any booking records for this machine
+        List<Booking> machineBookings = bookingRepository.findByMachineMachineID(id);
+
+        if (!machineBookings.isEmpty()) {
+            throw new IllegalStateException(
+                    "Cannot delete machine. There are " + machineBookings.size() +
+                            " booking record(s) associated with this machine. " +
+                            "Please ask the booking manager to delete all booking records first."
+            );
+        }
+
         machineRepository.deleteById(id);
     }
 
     public List<Machine> getMachinesByStatus(Machine.MachineStatus status) {
         try {
-            // Convert enum to database string format
             String dbStatus;
             switch (status) {
                 case AVAILABLE: dbStatus = "Available"; break;
-                case IN_USE: dbStatus = "InUse"; break;
                 case MAINTENANCE: dbStatus = "Maintenance"; break;
                 case BOOKED: dbStatus = "Booked"; break;
-                case OUT_OF_SERVICE: dbStatus = "OutOfService"; break;
                 default: dbStatus = "Available"; break;
             }
 
@@ -131,5 +137,41 @@ public class MachineService {
 
     public long countTotalMachines() {
         return machineRepository.count();
+    }
+
+    public List<Machine> getBookedMachines() {
+        try {
+            List<Machine> allMachines = machineRepository.findAll();
+            List<Machine> bookedMachines = new ArrayList<>();
+
+            for (Machine machine : allMachines) {
+                List<Booking> activeBookings = bookingRepository.findConflictingBookings(
+                        machine.getMachineID(),
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusDays(365)
+                );
+
+                // Machine is booked if it has active bookings OR status is BOOKED
+                if (!activeBookings.isEmpty() || machine.getStatus() == Machine.MachineStatus.BOOKED) {
+                    bookedMachines.add(machine);
+                }
+            }
+
+            return bookedMachines;
+
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Returns a list of machines that are in 'MAINTENANCE' status but do not yet have an associated
+     * maintenance record, indicating they are "alerts" needing attention.
+     */
+    public List<Machine> getMachinesNeedingAttention() {
+        List<Machine> maintenanceMachines = getMachinesByStatus(Machine.MachineStatus.MAINTENANCE);
+        return maintenanceMachines.stream()
+                .filter(machine -> maintenanceRecordRepository.findByMachine(machine).isEmpty())
+                .collect(Collectors.toList());
     }
 }

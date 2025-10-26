@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Add Machine to Repair - JCB Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+  <style>
+    body {
+      background-color: #FED16A;
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">JCB Management System</a>
+    <div class="navbar-nav ms-auto">
+      <a class="nav-link" href="/maintenance/available">Back to Available Machines</a>
+      <a class="nav-link" href="/logout">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h3>Add Machine to Repair</h3>
+        </div>
+        <div class="card-body">
+          <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <span th:text="${errorMessage}"></span>
+          </div>
+
+          <div class="alert alert-info">
+            <h5>Machine Details:</h5>
+            <p><strong>Model:</strong> <span th:text="${machine.model}">Model</span></p>
+            <p><strong>ID:</strong> <span th:text="${machine.machineID}">ID</span></p>
+            <p><strong>Serial Number:</strong> <span th:text="${machine.serialNumber ?: 'N/A'}">Serial</span></p>
+          </div>
+
+          <form th:action="@{/maintenance/add-repair}" th:object="${maintenanceRecord}" method="post">
+            <input type="hidden" name="machineId" th:value="${machine.machineID}">
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Repair Description *</label>
+              <textarea th:field="*{description}" id="description" class="form-control" rows="4"
+                        placeholder="Describe the maintenance/repair work needed..." required></textarea>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date *</label>
+                  <input type="datetime-local" th:field="*{startDate}" id="startDate"
+                         class="form-control" required>
+                  <div class="invalid-feedback" id="startDateError"></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">Expected End Date *</label>
+                  <input type="datetime-local" th:field="*{endDate}" id="endDate"
+                         class="form-control" required>
+                  <div class="invalid-feedback" id="endDateError"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <a href="/maintenance/available" class="btn btn-secondary me-md-2">Cancel</a>
+              <button type="submit" class="btn btn-warning">
+                <i class="bi bi-tools"></i> Add to Repair
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const startDateError = document.getElementById('startDateError');
+    const endDateError = document.getElementById('endDateError');
+    const form = startDateInput.closest('form');
+
+    // Set min attribute for start date to prevent past dates
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    startDateInput.min = minDateTime;
+
+    function validateDates() {
+      let isValid = true;
+
+      // Clear previous errors
+      startDateInput.classList.remove('is-invalid');
+      endDateInput.classList.remove('is-invalid');
+      startDateError.textContent = '';
+      endDateError.textContent = '';
+
+      const startDate = new Date(startDateInput.value);
+      const endDate = new Date(endDateInput.value);
+      const currentDateTime = new Date();
+
+      if (!startDateInput.value) {
+        startDateInput.classList.add('is-invalid');
+        startDateError.textContent = 'Start Date is required.';
+        isValid = false;
+      } else if (startDate < currentDateTime.setMinutes(currentDateTime.getMinutes() - 1)) { // Allow a small buffer
+        startDateInput.classList.add('is-invalid');
+        startDateError.textContent = 'Start Date cannot be in the past.';
+        isValid = false;
+      }
+
+      if (!endDateInput.value) {
+        endDateInput.classList.add('is-invalid');
+        endDateError.textContent = 'Expected End Date is required.';
+        isValid = false;
+      } else if (endDate < startDate) {
+        endDateInput.classList.add('is-invalid');
+        endDateError.textContent = 'Expected End Date cannot be before Start Date.';
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    // Add event listeners for real-time validation
+    startDateInput.addEventListener('change', function() {
+      if (startDateInput.value) {
+        endDateInput.min = startDateInput.value; // Ensure end date is not before start date
+      }
+      validateDates();
+    });
+    endDateInput.addEventListener('change', validateDates);
+
+    // Add form submission listener
+    form.addEventListener('submit', function(event) {
+      if (!validateDates()) {
+        event.preventDefault(); // Prevent form submission if validation fails
+      }
+    });
+  });
+</script>
+</body>
+</html>
