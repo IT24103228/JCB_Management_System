@@ -4,43 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="299b148d-9110-4162-805e-35d207d5b185" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/JCB-Management-SystemV2.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/src/main/resources/static/images/invoice_6_booking_11.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/src/main/resources/templates/maintenance/status.html" beforeDir="false" afterPath="$PROJECT_DIR$/jcbcustomerv37/src/main/resources/templates/maintenance/status.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/target/classes/com/jcbmanagement/user/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/jcbcustomerv37/target/classes/com/jcbmanagement/user/controller/UserController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/target/classes/com/jcbmanagement/user/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/jcbcustomerv37/target/classes/com/jcbmanagement/user/service/UserService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/target/classes/static/images/invoice_6_booking_11.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/target/test-classes/com/jcbmanagement/jcbmanagementsystem/JcbApplicationTests.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/invoices/invoice_5_booking_9.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/invoices/invoice_6_booking_11.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_10006_1758982327181.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_10008_1758985312634.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_10009_1758986065458.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_10010_1758987207904.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_10011_1758995946587.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_10012_1758996291216.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_10013_1758997089004.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_10_1760950909978.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_11_1760951536598.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_12_1760952132480.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_13_1760960236594.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_4_1758399970173.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_5_1758512559043.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_5_1760944931198.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_6_1758515334876.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_6_1760947429931.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_7_1760947746097.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_8_1760948594447.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jcbcustomerv37/uploads/payment-slips/booking_9_1760950583076.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/payment-slips/booking_19_1761461886626.png" beforeDir="false" />
-    </list>
+    <list default="true" id="299b148d-9110-4162-805e-35d207d5b185" name="Changes" comment="commit" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -129,11 +93,33 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1761463989610</updated>
-      <workItem from="1761463992617" duration="307000" />
+      <workItem from="1761463992617" duration="1126000" />
     </task>
+    <task id="LOCAL-00001" summary="commit">
+      <option name="closed" value="true" />
+      <created>1761464513253</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1761464513253</updated>
+    </task>
+    <task id="LOCAL-00002" summary="commit">
+      <option name="closed" value="true" />
+      <created>1761465117701</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1761465117701</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="[dyad] wrote 1 file(s) + extra files edited outside of Dyad" />
+    <MESSAGE value="commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="commit" />
   </component>
 </project>
